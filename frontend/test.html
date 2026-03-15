@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>测试页面</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+  <script src="https://unpkg.com/element-plus"></script>
+</head>
+<body>
+  <div id="app">
+    <div style="padding: 20px; background: #f0f2f5;">
+      <h2>测试按钮显示</h2>
+      
+      <div style="background: #fff; padding: 16px; border-radius: 8px; margin-top: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="color: #00a1d6; font-weight: bold;">B站房管工具</span>
+          
+          <el-input v-model="roomId" placeholder="输入房间号" style="width: 150px;" />
+          
+          <el-button type="primary" @click="start">
+            开始监听
+          </el-button>
+          
+          <el-button>设置</el-button>
+        </div>
+      </div>
+      
+      <p style="margin-top: 20px; color: #666;">
+        如果能看到上面的蓝色「开始监听」按钮，说明浏览器没问题。<br>
+        请返回 <a href="./index.html">主页面</a> 再试一次。
+      </p>
+    </div>
+  </div>
+  
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        const roomId = ref('');
+        const start = () => alert('点击了开始监听，房间号：' + roomId.value);
+        return { roomId, start };
+      }
+    }).use(ElementPlus).mount('#app');
+  </script>
+</body>
+</html>

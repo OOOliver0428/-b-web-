@@ -1,0 +1,10 @@
+{
+  "name": "bilibili-mod-tool-frontend",
+  "version": "1.0.0",
+  "description": "B站房管工具前端",
+  "scripts": {
+    "serve": "npx serve -s . -l 3000",
+    "dev": "npx serve -s . -l 3000"
+  },
+  "dependencies": {}
+}
