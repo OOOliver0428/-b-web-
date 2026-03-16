@@ -1,1 +1,54 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# pyenv
+.python-version
+
+# 环境变量
 .env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志
+*.log
+logs/
+
+# 敏感词库（可选，如果想公开可以删除这行）
+sensitive_words/
+
+# 打包输出
+out/
+dist/
+B 站房管工具-*.zip
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
