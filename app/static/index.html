@@ -6,12 +6,12 @@
   <title>B站房管工具 - 简化版</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-      background: #f0f2f5; 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
       padding: 20px;
     }
-    
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -20,7 +20,7 @@
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
       overflow: hidden;
     }
-    
+
     /* 顶部栏 */
     .header {
       background: #fff;
@@ -32,20 +32,20 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    
+
     .header-title {
       font-size: 20px;
       font-weight: 600;
       color: #00a1d6;
     }
-    
+
     .header-controls {
       display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
-    
+
     .input-box {
       padding: 8px 12px;
       border: 1px solid #dcdfe6;
@@ -54,11 +54,11 @@
       width: 150px;
       outline: none;
     }
-    
+
     .input-box:focus {
       border-color: #00a1d6;
     }
-    
+
     .btn {
       padding: 8px 16px;
       border: none;
@@ -67,41 +67,41 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    
+
     .btn-primary {
       background: #00a1d6;
       color: #fff;
     }
-    
+
     .btn-primary:hover {
       background: #008fb8;
     }
-    
+
     .btn-danger {
       background: #f56c6c;
       color: #fff;
     }
-    
+
     .btn-danger:hover {
       background: #f78989;
     }
-    
+
     .btn-default {
       background: #fff;
       border: 1px solid #dcdfe6;
       color: #606266;
     }
-    
+
     .btn-default:hover {
       border-color: #00a1d6;
       color: #00a1d6;
     }
-    
+
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-    
+
     .status {
       display: flex;
       align-items: center;
@@ -109,34 +109,34 @@
       font-size: 13px;
       color: #909399;
     }
-    
+
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: #909399;
     }
-    
+
     .status-dot.connected {
       background: #67c23a;
     }
-    
+
     .status-dot.connecting {
       background: #e6a23c;
       animation: blink 1s infinite;
     }
-    
+
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
-    
+
     /* 主体 */
     .main {
       display: flex;
       height: calc(100vh - 140px);
     }
-    
+
     /* 左侧弹幕区 */
     .danmaku-area {
       flex: 1;
@@ -144,7 +144,7 @@
       flex-direction: column;
       border-right: 1px solid #e4e7ed;
     }
-    
+
     .area-header {
       padding: 12px 16px;
       background: #fafafa;
@@ -153,23 +153,24 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .area-title {
       font-weight: 600;
       color: #303133;
     }
-    
+
     .area-stats {
       font-size: 12px;
       color: #909399;
     }
-    
+
     .danmaku-list {
-      flex: 1;
+      flex: 1 1 0;
       overflow-y: auto;
       padding: 12px;
+      min-height: 0;
     }
-    
+
     .danmaku-item {
       display: flex;
       align-items: flex-start;
@@ -179,41 +180,39 @@
       margin-bottom: 8px;
       transition: background 0.2s;
     }
-    
+
     .danmaku-item:hover {
       background: #f5f7fa;
     }
-    
+
     .danmaku-item.new {
       background: #e6f7ff;
       animation: fadeIn 0.5s ease;
     }
-    
-    /* 舰队等级背景 */
-    .danmaku-item.bg-governor {
-      background-image: url('/static/guard_bg/governor.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+
+    .danmaku-item.super-chat {
+      background: #fff3e0;
+      border-radius: 8px;
+      margin: 4px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .danmaku-item.bg-lieutenant {
-      background-image: url('/static/guard_bg/lieutenant.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+
+    .danmaku-item.super-chat:hover {
+      background: #ffe0b2;
     }
-    .danmaku-item.bg-captain {
-      background-image: url('/static/guard_bg/captain.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+
+    .badge-sc {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: #fff;
+      font-weight: bold;
+      font-size: 11px;
     }
-    
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateX(-10px); }
       to { opacity: 1; transform: translateX(0); }
     }
-    
+
     .avatar {
       width: 32px;
       height: 32px;
@@ -226,11 +225,11 @@
       font-size: 12px;
       flex-shrink: 0;
     }
-    
+
     .danmaku-content {
       flex: 1;
     }
-    
+
     .user-row {
       display: flex;
       align-items: center;
@@ -238,95 +237,53 @@
       margin-bottom: 4px;
       flex-wrap: wrap;
     }
-    
+
     .username {
       color: #00a1d6;
       font-weight: 500;
       cursor: pointer;
     }
-    
+
     .username:hover {
       text-decoration: underline;
     }
-    
+
     .badge {
       font-size: 10px;
       padding: 1px 5px;
       border-radius: 3px;
       color: #fff;
     }
-    
+
     .badge-admin { background: #ff4d4f; }
     .badge-vip { background: #ffd700; color: #333; }
     .badge-guard-1 { background: #ff0000; }
     .badge-guard-2 { background: #ff69b4; }
     .badge-guard-3 { background: #00ced1; }
-    
-    .badge-medal {
-      background: #fb7299;
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-size: 10px;
-    }
-    
-    .medal-level {
-      background: rgba(255,255,255,0.3);
-      padding: 0 3px;
-      border-radius: 2px;
-      margin-left: 2px;
-    }
-    
+
     .message-text {
       color: #303133;
       font-size: 13px;
       line-height: 1.5;
     }
-    
-    /* 弹幕字体大小档位 */
-    .danmaku-list.font-small .message-text {
-      font-size: 15px;
-    }
-    .danmaku-list.font-medium .message-text {
-      font-size: 25px;
-    }
-    .danmaku-list.font-large .message-text {
-      font-size: 35px;
-    }
-    
-    .font-size-btn {
-      background: #fff;
-      border: 1px solid #dcdfe6;
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-    .font-size-btn:hover {
-      background: #f5f7fa;
-    }
-    
+
     .message-time {
       font-size: 11px;
       color: #c0c4cc;
       margin-left: auto;
     }
-    
+
     .item-actions {
       display: flex;
       gap: 8px;
       opacity: 0;
       transition: opacity 0.2s;
     }
-    
+
     .danmaku-item:hover .item-actions {
       opacity: 1;
     }
-    
+
     .link-btn {
       color: #f56c6c;
       font-size: 12px;
@@ -335,18 +292,18 @@
       border: none;
       padding: 2px 6px;
     }
-    
+
     .link-btn:hover {
       color: #ff7875;
     }
-    
+
     /* 右侧边栏 */
     .sidebar {
       width: 300px;
       display: flex;
       flex-direction: column;
     }
-    
+
     .panel {
       border-bottom: 1px solid #e4e7ed;
       flex: 1;
@@ -354,11 +311,11 @@
       flex-direction: column;
       overflow: hidden;
     }
-    
+
     .panel:last-child {
       border-bottom: none;
     }
-    
+
     .panel-header {
       padding: 12px 16px;
       background: #fafafa;
@@ -369,13 +326,13 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .panel-body {
       flex: 1;
       overflow-y: auto;
       padding: 12px;
     }
-    
+
     .user-item {
       display: flex;
       justify-content: space-between;
@@ -384,11 +341,11 @@
       border-radius: 4px;
       margin-bottom: 4px;
     }
-    
+
     .user-item:hover {
       background: #f5f7fa;
     }
-    
+
     .ban-item {
       display: flex;
       justify-content: space-between;
@@ -396,27 +353,27 @@
       padding: 10px;
       border-bottom: 1px solid #ebeef5;
     }
-    
+
     .ban-item:last-child {
       border-bottom: none;
     }
-    
+
     .ban-name {
       font-size: 13px;
       color: #303133;
     }
-    
+
     .ban-time {
       font-size: 11px;
       color: #909399;
     }
-    
+
     .word-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    
+
     .word-tag {
       background: #fef0f0;
       color: #f56c6c;
@@ -427,19 +384,19 @@
       align-items: center;
       gap: 4px;
     }
-    
+
     .word-tag .remove {
       cursor: pointer;
       font-weight: bold;
     }
-    
+
     .empty-tip {
       text-align: center;
       color: #909399;
       padding: 40px 20px;
       font-size: 13px;
     }
-    
+
     /* 弹窗 */
     .modal-overlay {
       position: fixed;
@@ -453,7 +410,7 @@
       justify-content: center;
       z-index: 1000;
     }
-    
+
     .modal {
       background: #fff;
       border-radius: 8px;
@@ -461,18 +418,18 @@
       max-width: 90%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
+
     .modal-header {
       padding: 16px 20px;
       border-bottom: 1px solid #e4e7ed;
       font-weight: 600;
       font-size: 16px;
     }
-    
+
     .modal-body {
       padding: 20px;
     }
-    
+
     .modal-footer {
       padding: 12px 20px;
       border-top: 1px solid #e4e7ed;
@@ -480,50 +437,50 @@
       justify-content: flex-end;
       gap: 12px;
     }
-    
+
     .form-item {
       margin-bottom: 16px;
     }
-    
+
     .form-label {
       display: block;
       margin-bottom: 6px;
       font-size: 13px;
       color: #606266;
     }
-    
+
     .radio-group {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
     }
-    
+
     .radio-item {
       display: flex;
       align-items: center;
       gap: 4px;
       cursor: pointer;
     }
-    
+
     .hidden {
       display: none !important;
     }
-    
+
     /* 滚动条 */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: #c0c4cc;
       border-radius: 3px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       background: #909399;
     }
@@ -540,15 +497,15 @@
             <span class="status-dot" :class="statusClass"></span>
             <span>{{ statusText }}</span>
           </div>
-          <input 
-            type="text" 
-            class="input-box" 
-            v-model="roomId" 
+          <input
+            type="text"
+            class="input-box"
+            v-model="roomId"
             placeholder="输入房间号"
             :disabled="isConnected"
           >
-          <button 
-            class="btn" 
+          <button
+            class="btn"
             :class="isConnected ? 'btn-danger' : 'btn-primary'"
             :disabled="isConnecting"
             @click="toggleConnection"
@@ -564,47 +521,36 @@
         <div class="danmaku-area">
           <div class="area-header">
             <span class="area-title">实时弹幕</span>
-            <div style="display: flex; align-items: center;">
-              <button class="font-size-btn" @click="toggleFontSize" title="调整字体大小">
-                字体: {{ ['小', '中', '大'][fontSizeLevel] }}
-              </button>
-              <span class="area-stats" style="margin-left: 12px;">
-                弹幕: {{ danmakuList.length }} | 
-                <a href="#" @click.prevent="clearDanmaku" style="color: #00a1d6;">清空</a>
-              </span>
-            </div>
+            <span class="area-stats">
+              弹幕: {{ danmakuList.length }} |
+              <a href="#" @click.prevent="clearDanmaku" style="color: #00a1d6;">清空</a>
+            </span>
           </div>
-          <div class="danmaku-list" :class="fontSizeClasses[fontSizeLevel]" ref="danmakuListRef" style="position: relative;">
-            <div 
-              v-for="(item, index) in danmakuList" 
+          <div class="danmaku-list" ref="danmakuListRef">
+            <div
+              v-for="(item, index) in danmakuList"
               :key="index"
               class="danmaku-item"
-              :class="{ 
-                new: item.isNew,
-                'bg-governor': item.user?.guard_level === 1,
-                'bg-lieutenant': item.user?.guard_level === 2,
-                'bg-captain': item.user?.guard_level === 3
-              }"
+              :class="{ new: item.isNew, 'super-chat': item.type === 'super_chat' }"
+              :style="item.type === 'super_chat' ? { backgroundColor: item.background_color + '20', borderLeft: '4px solid ' + item.background_color } : {}"
             >
               <div class="avatar">{{ item.user?.name?.charAt(0) || '?' }}</div>
               <div class="danmaku-content">
                 <div class="user-row">
-                  <span class="username" @click="banUser(item.user, item.content)">{{ item.user?.name }}</span>
+                  <span class="username" @click="banUser(item.user, item.content || item.message)">{{ item.user?.name }}</span>
                   <span v-if="item.user?.is_admin" class="badge badge-admin">房管</span>
                   <span v-if="item.user?.is_vip" class="badge badge-vip">VIP</span>
                   <span v-if="item.user?.guard_level === 1" class="badge badge-guard-1">总督</span>
                   <span v-else-if="item.user?.guard_level === 2" class="badge badge-guard-2">提督</span>
                   <span v-else-if="item.user?.guard_level === 3" class="badge badge-guard-3">舰长</span>
-                  <span v-if="item.medal && item.medal.length > 1" class="badge badge-medal">
-                    {{ item.medal[1] }}<span class="medal-level">{{ item.medal[0] }}</span>
-                  </span>
-                  <span class="message-time">{{ formatTime(item.timestamp) }}</span>
+                  <span v-if="item.type === 'super_chat'" class="badge badge-sc">SC ¥{{ item.price }}</span>
+                  <span class="message-time">{{ formatTime(item.timestamp || item.start_time) }}</span>
                 </div>
-                <div class="message-text">{{ item.content }}</div>
+                <div class="message-text" :style="item.type === 'super_chat' ? { color: item.font_color } : {}">{{ item.content || item.message }}</div>
               </div>
               <div class="item-actions">
-                <button class="link-btn" @click="banUser(item.user, item.content)">禁言</button>
-                <button class="link-btn" @click="deleteDanmaku(item)">删除</button>
+                <button class="link-btn" @click="banUser(item.user, item.content || item.message)">禁言</button>
+                <button v-if="item.type !== 'super_chat'" class="link-btn" @click="deleteDanmaku(item)">删除</button>
               </div>
             </div>
             <div v-if="danmakuList.length === 0" class="empty-tip">
@@ -615,9 +561,9 @@
 
         <!-- 右侧边栏 -->
         <div class="sidebar">
-          <!-- 最近发言用户 -->
+          <!-- 在线用户 -->
           <div class="panel">
-            <div class="panel-header">最近发言 ({{ userList.length }})</div>
+            <div class="panel-header">在线用户 ({{ userList.length }})</div>
             <div class="panel-body">
               <div v-for="user in userList" :key="user.uid" class="user-item">
                 <span class="username" @click="banUser(user)">{{ user.name }}</span>
@@ -634,16 +580,12 @@
               <button class="btn btn-default" style="padding: 4px 8px; font-size: 12px;" @click="loadBanList" :disabled="!currentRoomId">刷新</button>
             </div>
             <div class="panel-body">
-              <div v-for="item in banList" :key="item.id" class="ban-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <div v-for="item in banList" :key="item.id" class="ban-item">
+                <div>
                   <div class="ban-name">{{ item.tname }}</div>
-                  <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" @click="confirmUnban(item)">解禁</button>
+                  <div class="ban-time">{{ item.ctime }}</div>
                 </div>
-                <div class="ban-time" style="font-size: 11px; color: #909399;">
-                  <span>🕐 {{ formatDateTime(item.ctime) }}</span>
-                  <span style="margin-left: 8px;">⏱️ {{ formatBanEndTime(item.block_end_time) }}</span>
-                  <span style="margin-left: 8px;">👤 {{ item.name }} {{ item.admin_level === 0 ? '(主播)' : '(房管)' }}</span>
-                </div>
+                <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" @click="unbanUser(item)">解禁</button>
               </div>
               <div v-if="banList.length === 0" class="empty-tip">暂无禁言用户</div>
             </div>
@@ -653,35 +595,27 @@
           <div class="panel">
             <div class="panel-header">敏感词过滤</div>
             <div class="panel-body">
-              <!-- 文件选择 -->
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">选择敏感词库</label>
-                <select 
-                  v-model="selectedSensitiveFile" 
-                  @change="loadSensitiveWordsFile"
-                  class="input-box" 
-                  style="width: 100%;"
+              <div class="word-tags">
+                <span v-for="word in sensitiveWords" :key="word" class="word-tag">
+                  {{ word }}
+                  <span class="remove" @click="removeWord(word)">×</span>
+                </span>
+              </div>
+              <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <input
+                  type="text"
+                  class="input-box"
+                  style="flex: 1;"
+                  v-model="newWord"
+                  placeholder="添加敏感词"
+                  @keyup.enter="addWord"
                 >
-                  <option value="">-- 不加载 --</option>
-                  <option v-for="file in sensitiveWordFiles" :key="file" :value="file">{{ file }}</option>
-                </select>
+                <button class="btn btn-primary" @click="addWord">添加</button>
               </div>
-              
-              <!-- 已加载的敏感词数量和文件名 -->
-              <div v-if="sensitiveWords.length > 0" style="font-size: 12px; color: #909399; margin-bottom: 8px;">
-                已加载 {{ selectedSensitiveFile }}: {{ sensitiveWords.length }} 个敏感词
-              </div>
-              
-              <!-- 自动禁言开关 -->
               <div style="margin-top: 12px; padding: 8px; background: #f5f7fa; border-radius: 4px; font-size: 12px; color: #666;">
                 <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
                   <input type="checkbox" v-model="autoCheck"> 自动禁言含敏感词的用户
                 </label>
-              </div>
-              
-              <!-- 提示 -->
-              <div style="margin-top: 8px; font-size: 11px; color: #999;">
-                敏感词文件位于服务端 sensitive_words/ 目录
               </div>
             </div>
           </div>
@@ -704,22 +638,16 @@
             <label class="form-label">禁言时长</label>
             <div class="radio-group">
               <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="0"> 当前直播
+                <input type="radio" v-model="banModal.hour" :value="0"> 本场直播
               </label>
               <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="1"> 1小时
+                <input type="radio" v-model="banModal.hour" :value="1"> 1小时
               </label>
               <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="24"> 24小时
+                <input type="radio" v-model="banModal.hour" :value="24"> 1天
               </label>
               <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="168"> 7天
-              </label>
-              <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="720"> 30天
-              </label>
-              <label class="radio-item">
-                <input type="radio" v-model="banModal.hour" value="-1"> 永久
+                <input type="radio" v-model="banModal.hour" :value="-1"> 永久
               </label>
             </div>
           </div>
@@ -735,24 +663,18 @@
       </div>
     </div>
   </div>
-  
-  <!-- 页脚版权信息 -->
-  <footer style="text-align: center; padding: 16px; font-size: 13px; color: #909399; background: #f5f7fa; margin-top: 20px; border-top: 1px solid #e4e7ed;">
-    © 2026 哔哩哔哩：江边砍柴
-  </footer>
 
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  
+
   <script>
     const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 
     createApp({
       setup() {
         // API 基础地址
-        // 自动检测 API 地址（当前域名）
-        const API_BASE = window.location.origin;
-        
+        const API_BASE = 'http://localhost:8000';
+
         // 状态
         const roomId = ref('');
         const currentRoomId = ref(null);
@@ -760,17 +682,15 @@
         const isConnecting = ref(false);
         const ws = ref(null);
         const danmakuListRef = ref(null);
-        
+
         // 数据
         const danmakuList = ref([]);
         const userList = ref([]);
         const banList = ref([]);
         const sensitiveWords = ref(['广告', '垃圾', '傻逼']);
+        const newWord = ref('');
+        const autoCheck = ref(true);
 
-        const autoCheck = ref(false);  // 默认关闭自动禁言
-        const sensitiveWordFiles = ref([]);  // 可用的敏感词文件列表
-        const selectedSensitiveFile = ref('');  // 当前选中的文件
-        
         // 弹窗
         const banModal = ref({
           show: false,
@@ -779,28 +699,20 @@
           hour: 1,
           reason: ''
         });
-        
-        // 弹幕字体大小档位：0=小(默认), 1=中, 2=大
-        const fontSizeLevel = ref(0);
-        const fontSizeClasses = ['font-small', 'font-medium', 'font-large'];
-        
-        function toggleFontSize() {
-          fontSizeLevel.value = (fontSizeLevel.value + 1) % 3;
-        }
-        
+
         // 计算属性
         const statusClass = computed(() => {
           if (isConnected.value) return 'connected';
           if (isConnecting.value) return 'connecting';
           return '';
         });
-        
+
         const statusText = computed(() => {
           if (isConnected.value) return '已连接';
           if (isConnecting.value) return '连接中...';
           return '未连接';
         });
-        
+
         // 方法
         async function toggleConnection() {
           if (isConnected.value) {
@@ -809,21 +721,21 @@
             await startListening();
           }
         }
-        
+
         async function startListening() {
           if (!roomId.value) {
             alert('请输入房间号');
             return;
           }
-          
+
           const rid = parseInt(roomId.value);
           if (isNaN(rid)) {
             alert('房间号必须是数字');
             return;
           }
-          
+
           isConnecting.value = true;
-          
+
           try {
             // 1. 启动房间
             const response = await fetch(`${API_BASE}/api/rooms/start`, {
@@ -831,60 +743,62 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ room_id: rid })
             });
-            
+
             if (!response.ok) {
               const err = await response.json();
               throw new Error(err.detail || '启动失败');
             }
-            
+
             currentRoomId.value = rid;
-            
+
             // 2. 连接 WebSocket
-            // WebSocket URL: http -> ws, https -> wss
-            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${wsProtocol}//${window.location.host}/api/ws/danmaku/${rid}`;
+            const wsUrl = `${API_BASE.replace('http', 'ws')}/api/ws/danmaku/${rid}`;
             ws.value = new WebSocket(wsUrl);
-            
+
             ws.value.onopen = () => {
               isConnected.value = true;
               isConnecting.value = false;
               console.log('WebSocket connected');
               loadBanList();
             };
-            
+
             ws.value.onmessage = (event) => {
               try {
                 const data = JSON.parse(event.data);
+                // 调试日志：显示所有消息类型
+                if (data.type === 'super_chat') {
+                  console.log('收到SC:', data);
+                }
                 handleMessage(data);
               } catch (e) {
                 console.error('Parse error:', e);
               }
             };
-            
+
             ws.value.onclose = () => {
               isConnected.value = false;
               isConnecting.value = false;
               console.log('WebSocket closed');
             };
-            
+
             ws.value.onerror = (err) => {
               console.error('WebSocket error:', err);
               isConnecting.value = false;
               alert('连接失败');
             };
-            
+
           } catch (error) {
             isConnecting.value = false;
             alert(error.message);
           }
         }
-        
+
         async function stopListening() {
           if (ws.value) {
             ws.value.close();
             ws.value = null;
           }
-          
+
           if (currentRoomId.value) {
             try {
               await fetch(`${API_BASE}/api/rooms/stop`, {
@@ -896,66 +810,70 @@
               console.error('Stop error:', e);
             }
           }
-          
+
           isConnected.value = false;
           isConnecting.value = false;
           currentRoomId.value = null;
           danmakuList.value = [];
           userList.value = [];
-          msgIdCache.clear();  // 清空去重缓存
         }
-        
+
         function handleMessage(data) {
           if (data.type === 'history') {
             data.data.forEach(msg => addDanmaku(msg, false));
             return;
           }
-          
+
           if (data.type === 'danmaku') {
             addDanmaku(data, true);
-            
+
             // 自动审核
             if (autoCheck.value) {
               checkAutoModeration(data);
             }
           }
-          
+
+          // 醒目留言（Super Chat）
+          if (data.type === 'super_chat') {
+            addDanmaku(data, true);
+          }
+
           if (data.type === 'enter') {
             addUser(data.user);
           }
         }
-        
-        // 消息去重缓存（最近200条消息的ID）
-        const msgIdCache = new Set();
-        
+
+        // 暴露到 window 方便调试
+        window.testSC = function() {
+          handleMessage({
+            type: 'super_chat',
+            user: { uid: 123456, name: '测试用户', face: '' },
+            message: '这是一条测试的醒目留言',
+            price: 30,
+            background_color: '#EDF5FF',
+            font_color: '#427D9E',
+            start_time: Date.now(),
+            id: 'test_' + Date.now()
+          });
+          console.log('SC 测试消息已发送');
+        };
+
         function addDanmaku(data, isNew) {
-          // 生成消息唯一ID
-          const msgId = data.msg_id || `${data.user?.uid}_${data.timestamp}_${data.content}`;
-          
-          // 检查是否重复
-          if (msgIdCache.has(msgId)) {
-            return; // 重复消息，直接返回
+          // 调试：确认添加SC到列表
+          if (data.type === 'super_chat') {
+            console.log('addDanmaku SC:', data.user?.name, data.message);
           }
-          
-          // 添加到缓存
-          msgIdCache.add(msgId);
-          // 限制缓存大小
-          if (msgIdCache.size > 200) {
-            const first = msgIdCache.values().next().value;
-            msgIdCache.delete(first);
-          }
-          
-          const danmaku = { ...data, isNew, _msgId: msgId };
+          const danmaku = { ...data, isNew };
           danmakuList.value.push(danmaku);
-          
+
           if (danmakuList.value.length > 500) {
             danmakuList.value = danmakuList.value.slice(-300);
           }
-          
+
           if (data.user) {
             addUser(data.user);
           }
-          
+
           nextTick(() => {
             if (danmakuListRef.value) {
               danmakuListRef.value.scrollTop = danmakuListRef.value.scrollHeight;
@@ -965,27 +883,19 @@
             }
           });
         }
-        
+
         function addUser(user) {
           if (!user || !user.uid) return;
-          // 移除已存在的相同用户（移到最前面）
-          const idx = userList.value.findIndex(u => u.uid === user.uid);
-          if (idx > -1) {
-            userList.value.splice(idx, 1);
-          }
-          // 添加到开头
-          userList.value.unshift(user);
-          // 限制数量（保留最近50个发言用户）
-          if (userList.value.length > 50) {
-            userList.value = userList.value.slice(0, 50);
+          if (!userList.value.find(u => u.uid === user.uid)) {
+            userList.value.push(user);
           }
         }
-        
+
         function checkAutoModeration(danmaku) {
           const content = danmaku.content || '';
           const userId = danmaku.user?.uid;
           if (!userId) return;
-          
+
           for (const word of sensitiveWords.value) {
             if (content.includes(word)) {
               banUserDirect(userId, 1, `触发敏感词: ${word}`);
@@ -993,45 +903,29 @@
             }
           }
         }
-        
+
         function banUser(user, msg = '') {
           if (!user) return;
-          // 防止重复弹出（如果已经在显示则先关闭再打开）
-          if (banModal.value.show) {
-            banModal.value.show = false;
-          }
-          // 使用 nextTick 确保状态更新后再显示
-          nextTick(() => {
-            banModal.value = {
-              show: true,
-              user,
-              msg,
-              hour: 1,
-              reason: ''
-            };
-          });
+          banModal.value = {
+            show: true,
+            user,
+            msg,
+            hour: 1,
+            reason: ''
+          };
         }
-        
+
         async function confirmBan() {
           if (!banModal.value.user) return;
-          // 确保hour是整数（radio的value是字符串，需要转换）
-          const hour = parseInt(banModal.value.hour);
-          console.log('禁言参数:', { hour, type: typeof hour, raw: banModal.value.hour });
-          
-          if (isNaN(hour)) {
-            alert('禁言时长选择错误');
-            return;
-          }
-          
           await banUserDirect(
             banModal.value.user.uid,
-            hour,
+            banModal.value.hour,
             banModal.value.reason
           );
           banModal.value.show = false;
           loadBanList();
         }
-        
+
         async function banUserDirect(userId, hour, reason) {
           if (!currentRoomId.value) return;
           try {
@@ -1054,15 +948,7 @@
             alert('禁言请求失败');
           }
         }
-        
-        async function confirmUnban(item) {
-          if (!currentRoomId.value) return;
-          if (!confirm(`确定要解禁用户 "${item.tname}" 吗？`)) {
-            return;
-          }
-          await unbanUser(item);
-        }
-        
+
         async function unbanUser(item) {
           if (!currentRoomId.value) return;
           try {
@@ -1084,139 +970,65 @@
             alert('解禁请求失败');
           }
         }
-        
+
         async function loadBanList() {
-          if (!currentRoomId.value) {
-            alert('请先连接直播间');
-            return;
-          }
+          if (!currentRoomId.value) return;
           try {
             const response = await fetch(`${API_BASE}/api/moderation/ban-list/${currentRoomId.value}`);
             const data = await response.json();
-            if (data.code === 0) {
-              banList.value = data.data || [];
-            } else {
-              console.error('获取禁言列表失败:', data.message);
-            }
+            banList.value = data.data || [];
           } catch (e) {
             console.error('Load ban list error:', e);
-            alert('获取禁言列表失败');
           }
         }
-        
+
         function deleteDanmaku(item) {
           alert('删除弹幕功能开发中');
         }
-        
+
         function clearDanmaku() {
           danmakuList.value = [];
         }
-        
-        // 获取可用的敏感词文件列表
-        async function loadSensitiveWordFiles() {
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-word-files`);
-            const data = await response.json();
-            if (data.code === 0) {
-              sensitiveWordFiles.value = data.data || [];
-            }
-          } catch (e) {
-            console.error('加载敏感词文件列表失败:', e);
-          }
-        }
-        
-        // 加载选中的敏感词文件
-        async function loadSensitiveWordsFile() {
-          if (!selectedSensitiveFile.value) {
-            sensitiveWords.value = [];
+
+        function addWord() {
+          const word = newWord.value.trim();
+          if (!word) return;
+          if (sensitiveWords.value.includes(word)) {
+            alert('该敏感词已存在');
             return;
           }
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-words/load`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ filename: selectedSensitiveFile.value })
-            });
-            const data = await response.json();
-            if (data.code === 0) {
-              sensitiveWords.value = data.data || [];
-              alert(`已加载 ${data.data.length} 个敏感词`);
-            } else {
-              alert('加载失败: ' + data.message);
-            }
-          } catch (e) {
-            console.error('加载敏感词文件失败:', e);
-            alert('加载失败');
+          sensitiveWords.value.push(word);
+          newWord.value = '';
+        }
+
+        function removeWord(word) {
+          const idx = sensitiveWords.value.indexOf(word);
+          if (idx > -1) {
+            sensitiveWords.value.splice(idx, 1);
           }
         }
-        
+
         function formatTime(timestamp) {
           if (!timestamp) return '';
-          const date = timestamp.toString().length === 13 
-            ? new Date(timestamp) 
+          const date = timestamp.toString().length === 13
+            ? new Date(timestamp)
             : new Date(timestamp * 1000);
           return date.toLocaleTimeString('zh-CN', { hour12: false });
         }
-        
-        function formatDateTime(datetimeStr) {
-          if (!datetimeStr) return '';
-          // B站返回格式: "2024-03-15 18:30:00"
-          const date = new Date(datetimeStr.replace(/-/g, '/'));
-          if (isNaN(date.getTime())) return datetimeStr;
-          
-          const now = new Date();
-          const diff = now - date;
-          const minutes = Math.floor(diff / 60000);
-          const hours = Math.floor(diff / 3600000);
-          const days = Math.floor(diff / 86400000);
-          
-          if (minutes < 1) return '刚刚';
-          if (minutes < 60) return `${minutes}分钟前`;
-          if (hours < 24) return `${hours}小时前`;
-          if (days < 7) return `${days}天前`;
-          
-          return date.toLocaleString('zh-CN', { 
-            month: '2-digit', 
-            day: '2-digit', 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          });
-        }
-        
-        function formatBanEndTime(blockEndTime) {
-          // block_end_time: "0" 表示永久，其他是日期字符串如 "2026-03-15 22:00:12"
-          if (!blockEndTime || blockEndTime === '0' || blockEndTime === 0) {
-            return '永久';
-          }
-          
-          // 如果是纯数字（时间戳），转换为日期
-          if (/^\d+$/.test(blockEndTime)) {
-            let timestamp = parseInt(blockEndTime);
-            if (timestamp < 10000000000) {
-              timestamp = timestamp * 1000;
-            }
-            const date = new Date(timestamp);
-            if (!isNaN(date.getTime())) {
-              return date.toLocaleString('zh-CN');
-            }
-          }
-          
-          // 否则直接返回字符串（已经是日期格式）
-          return blockEndTime;
-        }
-        
-        // 组件挂载时加载敏感词文件列表
+
+        // 定期刷新禁言列表
+        let interval = null;
         onMounted(() => {
-          // 强制确保禁言弹窗处于关闭状态（防止某些情况下自动弹出）
-          banModal.value.show = false;
-          loadSensitiveWordFiles();
+          interval = setInterval(() => {
+            if (isConnected.value) loadBanList();
+          }, 5000);
         });
-        
-        // 组件卸载时清理
+
         onUnmounted(() => {
+          if (interval) clearInterval(interval);
           if (ws.value) ws.value.close();
         });
-        
+
         return {
           roomId,
           isConnected,
@@ -1228,8 +1040,7 @@
           userList,
           banList,
           sensitiveWords,
-          sensitiveWordFiles,
-          selectedSensitiveFile,
+          newWord,
           autoCheck,
           banModal,
           currentRoomId,
@@ -1240,15 +1051,9 @@
           loadBanList,
           deleteDanmaku,
           clearDanmaku,
-          loadSensitiveWordFiles,
-          loadSensitiveWordsFile,
-          formatTime,
-          formatDateTime,
-          formatBanEndTime,
-          fontSizeLevel,
-          fontSizeClasses,
-          toggleFontSize,
-          confirmUnban
+          addWord,
+          removeWord,
+          formatTime
         };
       }
     }).mount('#app');

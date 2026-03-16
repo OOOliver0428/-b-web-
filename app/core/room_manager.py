@@ -1,7 +1,8 @@
 """直播间管理器"""
 import asyncio
-from typing import Dict, Optional, List, Callable, Any
+from typing import Dict, Optional, List, Callable, Any, Set
 from dataclasses import dataclass, field
+from collections import deque
 from loguru import logger
 
 from app.core.danmaku_ws import DanmakuClient
@@ -17,6 +18,8 @@ class Room:
     danmaku_history: List[Dict] = field(default_factory=list)
     banned_users: Dict[int, Dict] = field(default_factory=dict)
     callbacks: List[Callable] = field(default_factory=list)
+    # 全局消息去重（多连接时避免重复）
+    _seen_msg_ids: deque = field(default_factory=lambda: deque(maxlen=5000))
     
     def add_callback(self, callback: Callable):
         """添加消息回调"""
@@ -27,8 +30,34 @@ class Room:
         if callback in self.callbacks:
             self.callbacks.remove(callback)
     
+    def _is_duplicate(self, msg: Dict) -> bool:
+        """检查消息是否重复"""
+        # 使用 msg_id 或生成唯一标识
+        msg_id = msg.get('msg_id') or msg.get('id')
+        if msg_id:
+            if msg_id in self._seen_msg_ids:
+                return True
+            self._seen_msg_ids.append(msg_id)
+            return False
+        
+        # 没有ID时使用内容+时间戳生成标识
+        msg_type = msg.get('type', 'unknown')
+        user_id = msg.get('user', {}).get('uid', 0)
+        timestamp = msg.get('timestamp') or msg.get('start_time', 0)
+        content = msg.get('content') or msg.get('message', '')
+        
+        unique_key = f"{msg_type}:{user_id}:{timestamp}:{content[:20]}"
+        if unique_key in self._seen_msg_ids:
+            return True
+        self._seen_msg_ids.append(unique_key)
+        return False
+    
     async def on_message(self, msg: Dict):
         """收到消息时调用"""
+        # 全局去重（多连接时避免重复）
+        if self._is_duplicate(msg):
+            return
+        
         # 保存历史记录（限制数量）
         self.danmaku_history.append(msg)
         if len(self.danmaku_history) > 1000:

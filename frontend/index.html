@@ -6,12 +6,12 @@
   <title>B站房管工具 - 简化版</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-      background: #f0f2f5; 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
       padding: 20px;
     }
-    
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -20,7 +20,7 @@
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
       overflow: hidden;
     }
-    
+
     /* 顶部栏 */
     .header {
       background: #fff;
@@ -32,20 +32,20 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    
+
     .header-title {
       font-size: 20px;
       font-weight: 600;
       color: #00a1d6;
     }
-    
+
     .header-controls {
       display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
-    
+
     .input-box {
       padding: 8px 12px;
       border: 1px solid #dcdfe6;
@@ -54,11 +54,11 @@
       width: 150px;
       outline: none;
     }
-    
+
     .input-box:focus {
       border-color: #00a1d6;
     }
-    
+
     .btn {
       padding: 8px 16px;
       border: none;
@@ -67,41 +67,41 @@
       cursor: pointer;
       transition: all 0.3s;
     }
-    
+
     .btn-primary {
       background: #00a1d6;
       color: #fff;
     }
-    
+
     .btn-primary:hover {
       background: #008fb8;
     }
-    
+
     .btn-danger {
       background: #f56c6c;
       color: #fff;
     }
-    
+
     .btn-danger:hover {
       background: #f78989;
     }
-    
+
     .btn-default {
       background: #fff;
       border: 1px solid #dcdfe6;
       color: #606266;
     }
-    
+
     .btn-default:hover {
       border-color: #00a1d6;
       color: #00a1d6;
     }
-    
+
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-    
+
     .status {
       display: flex;
       align-items: center;
@@ -109,34 +109,34 @@
       font-size: 13px;
       color: #909399;
     }
-    
+
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: #909399;
     }
-    
+
     .status-dot.connected {
       background: #67c23a;
     }
-    
+
     .status-dot.connecting {
       background: #e6a23c;
       animation: blink 1s infinite;
     }
-    
+
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
-    
+
     /* 主体 */
     .main {
       display: flex;
       height: calc(100vh - 140px);
     }
-    
+
     /* 左侧弹幕区 */
     .danmaku-area {
       flex: 1;
@@ -144,7 +144,7 @@
       flex-direction: column;
       border-right: 1px solid #e4e7ed;
     }
-    
+
     .area-header {
       padding: 12px 16px;
       background: #fafafa;
@@ -153,24 +153,24 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .area-title {
       font-weight: 600;
       color: #303133;
     }
-    
+
     .area-stats {
       font-size: 12px;
       color: #909399;
     }
-    
+
     .danmaku-list {
       flex: 1 1 0;
       overflow-y: auto;
       padding: 12px;
       min-height: 0;
     }
-    
+
     .danmaku-item {
       display: flex;
       align-items: flex-start;
@@ -180,39 +180,39 @@
       margin-bottom: 8px;
       transition: background 0.2s;
     }
-    
+
     .danmaku-item:hover {
       background: #f5f7fa;
     }
-    
+
     .danmaku-item.new {
       background: #e6f7ff;
       animation: fadeIn 0.5s ease;
     }
-    
+
     .danmaku-item.super-chat {
       background: #fff3e0;
       border-radius: 8px;
       margin: 4px 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
+
     .danmaku-item.super-chat:hover {
       background: #ffe0b2;
     }
-    
+
     .badge-sc {
       background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
       color: #fff;
       font-weight: bold;
       font-size: 11px;
     }
-    
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateX(-10px); }
       to { opacity: 1; transform: translateX(0); }
     }
-    
+
     .avatar {
       width: 32px;
       height: 32px;
@@ -225,11 +225,11 @@
       font-size: 12px;
       flex-shrink: 0;
     }
-    
+
     .danmaku-content {
       flex: 1;
     }
-    
+
     .user-row {
       display: flex;
       align-items: center;
@@ -237,53 +237,53 @@
       margin-bottom: 4px;
       flex-wrap: wrap;
     }
-    
+
     .username {
       color: #00a1d6;
       font-weight: 500;
       cursor: pointer;
     }
-    
+
     .username:hover {
       text-decoration: underline;
     }
-    
+
     .badge {
       font-size: 10px;
       padding: 1px 5px;
       border-radius: 3px;
       color: #fff;
     }
-    
+
     .badge-admin { background: #ff4d4f; }
     .badge-vip { background: #ffd700; color: #333; }
     .badge-guard-1 { background: #ff0000; }
     .badge-guard-2 { background: #ff69b4; }
     .badge-guard-3 { background: #00ced1; }
-    
+
     .message-text {
       color: #303133;
       font-size: 13px;
       line-height: 1.5;
     }
-    
+
     .message-time {
       font-size: 11px;
       color: #c0c4cc;
       margin-left: auto;
     }
-    
+
     .item-actions {
       display: flex;
       gap: 8px;
       opacity: 0;
       transition: opacity 0.2s;
     }
-    
+
     .danmaku-item:hover .item-actions {
       opacity: 1;
     }
-    
+
     .link-btn {
       color: #f56c6c;
       font-size: 12px;
@@ -292,18 +292,18 @@
       border: none;
       padding: 2px 6px;
     }
-    
+
     .link-btn:hover {
       color: #ff7875;
     }
-    
+
     /* 右侧边栏 */
     .sidebar {
       width: 300px;
       display: flex;
       flex-direction: column;
     }
-    
+
     .panel {
       border-bottom: 1px solid #e4e7ed;
       flex: 1;
@@ -311,11 +311,11 @@
       flex-direction: column;
       overflow: hidden;
     }
-    
+
     .panel:last-child {
       border-bottom: none;
     }
-    
+
     .panel-header {
       padding: 12px 16px;
       background: #fafafa;
@@ -326,13 +326,13 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .panel-body {
       flex: 1;
       overflow-y: auto;
       padding: 12px;
     }
-    
+
     .user-item {
       display: flex;
       justify-content: space-between;
@@ -341,11 +341,11 @@
       border-radius: 4px;
       margin-bottom: 4px;
     }
-    
+
     .user-item:hover {
       background: #f5f7fa;
     }
-    
+
     .ban-item {
       display: flex;
       justify-content: space-between;
@@ -353,27 +353,27 @@
       padding: 10px;
       border-bottom: 1px solid #ebeef5;
     }
-    
+
     .ban-item:last-child {
       border-bottom: none;
     }
-    
+
     .ban-name {
       font-size: 13px;
       color: #303133;
     }
-    
+
     .ban-time {
       font-size: 11px;
       color: #909399;
     }
-    
+
     .word-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    
+
     .word-tag {
       background: #fef0f0;
       color: #f56c6c;
@@ -384,19 +384,19 @@
       align-items: center;
       gap: 4px;
     }
-    
+
     .word-tag .remove {
       cursor: pointer;
       font-weight: bold;
     }
-    
+
     .empty-tip {
       text-align: center;
       color: #909399;
       padding: 40px 20px;
       font-size: 13px;
     }
-    
+
     /* 弹窗 */
     .modal-overlay {
       position: fixed;
@@ -410,7 +410,7 @@
       justify-content: center;
       z-index: 1000;
     }
-    
+
     .modal {
       background: #fff;
       border-radius: 8px;
@@ -418,18 +418,18 @@
       max-width: 90%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
+
     .modal-header {
       padding: 16px 20px;
       border-bottom: 1px solid #e4e7ed;
       font-weight: 600;
       font-size: 16px;
     }
-    
+
     .modal-body {
       padding: 20px;
     }
-    
+
     .modal-footer {
       padding: 12px 20px;
       border-top: 1px solid #e4e7ed;
@@ -437,50 +437,50 @@
       justify-content: flex-end;
       gap: 12px;
     }
-    
+
     .form-item {
       margin-bottom: 16px;
     }
-    
+
     .form-label {
       display: block;
       margin-bottom: 6px;
       font-size: 13px;
       color: #606266;
     }
-    
+
     .radio-group {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
     }
-    
+
     .radio-item {
       display: flex;
       align-items: center;
       gap: 4px;
       cursor: pointer;
     }
-    
+
     .hidden {
       display: none !important;
     }
-    
+
     /* 滚动条 */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: #c0c4cc;
       border-radius: 3px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       background: #909399;
     }
@@ -497,15 +497,15 @@
             <span class="status-dot" :class="statusClass"></span>
             <span>{{ statusText }}</span>
           </div>
-          <input 
-            type="text" 
-            class="input-box" 
-            v-model="roomId" 
+          <input
+            type="text"
+            class="input-box"
+            v-model="roomId"
             placeholder="输入房间号"
             :disabled="isConnected"
           >
-          <button 
-            class="btn" 
+          <button
+            class="btn"
             :class="isConnected ? 'btn-danger' : 'btn-primary'"
             :disabled="isConnecting"
             @click="toggleConnection"
@@ -522,13 +522,13 @@
           <div class="area-header">
             <span class="area-title">实时弹幕</span>
             <span class="area-stats">
-              弹幕: {{ danmakuList.length }} | 
+              弹幕: {{ danmakuList.length }} |
               <a href="#" @click.prevent="clearDanmaku" style="color: #00a1d6;">清空</a>
             </span>
           </div>
           <div class="danmaku-list" ref="danmakuListRef">
-            <div 
-              v-for="(item, index) in danmakuList" 
+            <div
+              v-for="(item, index) in danmakuList"
               :key="index"
               class="danmaku-item"
               :class="{ new: item.isNew, 'super-chat': item.type === 'super_chat' }"
@@ -602,11 +602,11 @@
                 </span>
               </div>
               <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <input 
-                  type="text" 
-                  class="input-box" 
-                  style="flex: 1;" 
-                  v-model="newWord" 
+                <input
+                  type="text"
+                  class="input-box"
+                  style="flex: 1;"
+                  v-model="newWord"
                   placeholder="添加敏感词"
                   @keyup.enter="addWord"
                 >
@@ -666,7 +666,7 @@
 
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  
+
   <script>
     const { createApp, ref, computed, onMounted, onUnmounted, nextTick } = Vue;
 
@@ -674,7 +674,7 @@
       setup() {
         // API 基础地址
         const API_BASE = 'http://localhost:8000';
-        
+
         // 状态
         const roomId = ref('');
         const currentRoomId = ref(null);
@@ -682,7 +682,7 @@
         const isConnecting = ref(false);
         const ws = ref(null);
         const danmakuListRef = ref(null);
-        
+
         // 数据
         const danmakuList = ref([]);
         const userList = ref([]);
@@ -690,7 +690,7 @@
         const sensitiveWords = ref(['广告', '垃圾', '傻逼']);
         const newWord = ref('');
         const autoCheck = ref(true);
-        
+
         // 弹窗
         const banModal = ref({
           show: false,
@@ -699,20 +699,20 @@
           hour: 1,
           reason: ''
         });
-        
+
         // 计算属性
         const statusClass = computed(() => {
           if (isConnected.value) return 'connected';
           if (isConnecting.value) return 'connecting';
           return '';
         });
-        
+
         const statusText = computed(() => {
           if (isConnected.value) return '已连接';
           if (isConnecting.value) return '连接中...';
           return '未连接';
         });
-        
+
         // 方法
         async function toggleConnection() {
           if (isConnected.value) {
@@ -721,21 +721,21 @@
             await startListening();
           }
         }
-        
+
         async function startListening() {
           if (!roomId.value) {
             alert('请输入房间号');
             return;
           }
-          
+
           const rid = parseInt(roomId.value);
           if (isNaN(rid)) {
             alert('房间号必须是数字');
             return;
           }
-          
+
           isConnecting.value = true;
-          
+
           try {
             // 1. 启动房间
             const response = await fetch(`${API_BASE}/api/rooms/start`, {
@@ -743,58 +743,62 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ room_id: rid })
             });
-            
+
             if (!response.ok) {
               const err = await response.json();
               throw new Error(err.detail || '启动失败');
             }
-            
+
             currentRoomId.value = rid;
-            
+
             // 2. 连接 WebSocket
             const wsUrl = `${API_BASE.replace('http', 'ws')}/api/ws/danmaku/${rid}`;
             ws.value = new WebSocket(wsUrl);
-            
+
             ws.value.onopen = () => {
               isConnected.value = true;
               isConnecting.value = false;
               console.log('WebSocket connected');
               loadBanList();
             };
-            
+
             ws.value.onmessage = (event) => {
               try {
                 const data = JSON.parse(event.data);
+                // 调试日志：显示所有消息类型
+                if (data.type === 'super_chat') {
+                  console.log('收到SC:', data);
+                }
                 handleMessage(data);
               } catch (e) {
                 console.error('Parse error:', e);
               }
             };
-            
+
             ws.value.onclose = () => {
               isConnected.value = false;
               isConnecting.value = false;
               console.log('WebSocket closed');
             };
-            
+
             ws.value.onerror = (err) => {
               console.error('WebSocket error:', err);
               isConnecting.value = false;
               alert('连接失败');
             };
-            
+
           } catch (error) {
             isConnecting.value = false;
             alert(error.message);
           }
         }
-        
+
         async function stopListening() {
           if (ws.value) {
             ws.value.close();
             ws.value = null;
           }
-          
+
           if (currentRoomId.value) {
             try {
               await fetch(`${API_BASE}/api/rooms/stop`, {
@@ -806,46 +810,70 @@
               console.error('Stop error:', e);
             }
           }
-          
+
           isConnected.value = false;
           isConnecting.value = false;
           currentRoomId.value = null;
           danmakuList.value = [];
           userList.value = [];
         }
-        
+
         function handleMessage(data) {
           if (data.type === 'history') {
             data.data.forEach(msg => addDanmaku(msg, false));
             return;
           }
-          
+
           if (data.type === 'danmaku') {
             addDanmaku(data, true);
-            
+
             // 自动审核
             if (autoCheck.value) {
               checkAutoModeration(data);
             }
           }
-          
+
+          // 醒目留言（Super Chat）
+          if (data.type === 'super_chat') {
+            addDanmaku(data, true);
+          }
+
           if (data.type === 'enter') {
             addUser(data.user);
           }
         }
-        
+
+        // 暴露到 window 方便调试
+        window.testSC = function() {
+          handleMessage({
+            type: 'super_chat',
+            user: { uid: 123456, name: '测试用户', face: '' },
+            message: '这是一条测试的醒目留言',
+            price: 30,
+            background_color: '#EDF5FF',
+            font_color: '#427D9E',
+            start_time: Date.now(),
+            id: 'test_' + Date.now()
+          });
+          console.log('SC 测试消息已发送');
+        };
+
         function addDanmaku(data, isNew) {
+          // 调试：确认添加SC到列表
+          if (data.type === 'super_chat') {
+            console.log('addDanmaku SC:', data.user?.name, data.message);
+          }
           const danmaku = { ...data, isNew };
           danmakuList.value.push(danmaku);
-          
+
           if (danmakuList.value.length > 500) {
             danmakuList.value = danmakuList.value.slice(-300);
           }
-          
+
           if (data.user) {
             addUser(data.user);
           }
-          
+
           nextTick(() => {
             if (danmakuListRef.value) {
               danmakuListRef.value.scrollTop = danmakuListRef.value.scrollHeight;
@@ -855,19 +883,19 @@
             }
           });
         }
-        
+
         function addUser(user) {
           if (!user || !user.uid) return;
           if (!userList.value.find(u => u.uid === user.uid)) {
             userList.value.push(user);
           }
         }
-        
+
         function checkAutoModeration(danmaku) {
           const content = danmaku.content || '';
           const userId = danmaku.user?.uid;
           if (!userId) return;
-          
+
           for (const word of sensitiveWords.value) {
             if (content.includes(word)) {
               banUserDirect(userId, 1, `触发敏感词: ${word}`);
@@ -875,7 +903,7 @@
             }
           }
         }
-        
+
         function banUser(user, msg = '') {
           if (!user) return;
           banModal.value = {
@@ -886,7 +914,7 @@
             reason: ''
           };
         }
-        
+
         async function confirmBan() {
           if (!banModal.value.user) return;
           await banUserDirect(
@@ -897,7 +925,7 @@
           banModal.value.show = false;
           loadBanList();
         }
-        
+
         async function banUserDirect(userId, hour, reason) {
           if (!currentRoomId.value) return;
           try {
@@ -920,7 +948,7 @@
             alert('禁言请求失败');
           }
         }
-        
+
         async function unbanUser(item) {
           if (!currentRoomId.value) return;
           try {
@@ -942,7 +970,7 @@
             alert('解禁请求失败');
           }
         }
-        
+
         async function loadBanList() {
           if (!currentRoomId.value) return;
           try {
@@ -953,15 +981,15 @@
             console.error('Load ban list error:', e);
           }
         }
-        
+
         function deleteDanmaku(item) {
           alert('删除弹幕功能开发中');
         }
-        
+
         function clearDanmaku() {
           danmakuList.value = [];
         }
-        
+
         function addWord() {
           const word = newWord.value.trim();
           if (!word) return;
@@ -972,22 +1000,22 @@
           sensitiveWords.value.push(word);
           newWord.value = '';
         }
-        
+
         function removeWord(word) {
           const idx = sensitiveWords.value.indexOf(word);
           if (idx > -1) {
             sensitiveWords.value.splice(idx, 1);
           }
         }
-        
+
         function formatTime(timestamp) {
           if (!timestamp) return '';
-          const date = timestamp.toString().length === 13 
-            ? new Date(timestamp) 
+          const date = timestamp.toString().length === 13
+            ? new Date(timestamp)
             : new Date(timestamp * 1000);
           return date.toLocaleTimeString('zh-CN', { hour12: false });
         }
-        
+
         // 定期刷新禁言列表
         let interval = null;
         onMounted(() => {
@@ -995,12 +1023,12 @@
             if (isConnected.value) loadBanList();
           }, 5000);
         });
-        
+
         onUnmounted(() => {
           if (interval) clearInterval(interval);
           if (ws.value) ws.value.close();
         });
-        
+
         return {
           roomId,
           isConnected,
