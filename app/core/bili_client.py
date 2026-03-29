@@ -51,9 +51,13 @@ class BilibiliClient:
     async def close(self):
         await self.client.aclose()
     
-    async def get_room_info(self, room_id: int) -> Optional[Dict[str, Any]]:
-        """获取直播间信息"""
-        url = f"{self.BASE_URL}/room/v1/Room/get_info"
+    async def get_room_init(self, room_id: int) -> Optional[Dict[str, Any]]:
+        """
+        获取房间初始化信息（支持短号翻译）
+        API: https://api.live.bilibili.com/room/v1/Room/room_init
+        返回数据包含: room_id(真实房间号), short_id(短号), uid(主播ID) 等
+        """
+        url = f"{self.BASE_URL}/room/v1/Room/room_init"
         params = {"id": room_id}
         
         try:
@@ -61,9 +65,125 @@ class BilibiliClient:
             data = resp.json()
             if data.get("code") == 0:
                 return data.get("data")
+            logger.warning(f"获取房间初始化信息失败: {data}")
+        except Exception as e:
+            logger.error(f"获取房间初始化信息异常: {e}")
+        return None
+    
+    async def get_room_info(self, room_id: int) -> Optional[Dict[str, Any]]:
+        """获取直播间详细信息（包含标题、主播名等）"""
+        url = f"{self.BASE_URL}/room/v1/Room/get_info"
+        params = {"room_id": room_id}
+        
+        try:
+            resp = await self.client.get(url, params=params)
+            data = resp.json()
+            if data.get("code") == 0:
+                room_data = data.get("data", {})
+                # get_info 接口不返回主播名称，需要额外获取
+                uname = await self._get_anchor_name(room_id)
+                if uname:
+                    room_data["uname"] = uname
+                return room_data
             logger.warning(f"获取房间信息失败: {data}")
         except Exception as e:
             logger.error(f"获取房间信息异常: {e}")
+        return None
+    
+    async def _get_anchor_name(self, room_id: int) -> Optional[str]:
+        """
+        获取主播名称
+        使用 get_info_by_id 接口，该接口返回 uname 字段
+        """
+        url = f"{self.BASE_URL}/room/v1/Room/get_info_by_id"
+        params = {"ids[]": room_id}
+        
+        try:
+            resp = await self.client.get(url, params=params)
+            data = resp.json()
+            if data.get("code") == 0:
+                rooms_data = data.get("data", {})
+                # 返回的数据格式: {"room_id": {...}}
+                for room_data in rooms_data.values():
+                    uname = room_data.get("uname")
+                    if uname:
+                        logger.debug(f"获取主播名称成功: {uname}")
+                        return uname
+            logger.debug(f"获取主播名称失败: {data}")
+        except Exception as e:
+            logger.error(f"获取主播名称异常: {e}")
+        return None
+    
+    async def resolve_room_id(self, input_room_id: int) -> Optional[Dict[str, Any]]:
+        """
+        解析房间号（支持短号翻译）
+        优先尝试作为真实房间号获取信息，如果失败则尝试作为短号翻译
+        
+        返回: {
+            "room_id": 真实房间号,
+            "short_id": 短号(如果有),
+            "uid": 主播ID,
+            "title": 直播标题,
+            "uname": 主播名称,
+            "live_status": 直播状态,
+            ...
+        }
+        """
+        # 首先尝试作为真实房间号获取详细信息
+        room_info = await self.get_room_info(input_room_id)
+        
+        if room_info and room_info.get("room_id"):
+            # 输入的是真实房间号，获取 room_init 补充信息
+            logger.info(f"房间号 {input_room_id} 识别为真实房间号")
+            room_init = await self.get_room_init(input_room_id)
+            if room_init:
+                # 合并信息
+                # 主播名称可能来自不同的字段，统一为 uname
+                anchor_name = room_info.get("anchor_name") or room_info.get("uname", "")
+                return {
+                    **room_info,
+                    "uid": room_init.get("uid"),
+                    "short_id": room_init.get("short_id", 0),
+                    "is_short_id": False,
+                    "uname": anchor_name,
+                }
+            return room_info
+        
+        # 尝试作为短号翻译
+        logger.info(f"房间号 {input_room_id} 可能为短号，尝试翻译...")
+        room_init = await self.get_room_init(input_room_id)
+        
+        if room_init and room_init.get("room_id"):
+            real_room_id = room_init.get("room_id")
+            logger.info(f"短号 {input_room_id} 翻译为真实房间号: {real_room_id}")
+            
+            # 获取详细信息
+            room_info = await self.get_room_info(real_room_id)
+            
+            if room_info:
+                # 主播名称可能来自不同的字段，统一为 uname
+                anchor_name = room_info.get("anchor_name") or room_info.get("uname", "")
+                return {
+                    **room_info,
+                    "uid": room_init.get("uid"),
+                    "short_id": room_init.get("short_id", 0),
+                    "is_short_id": True,
+                    "input_id": input_room_id,
+                    "uname": anchor_name,
+                }
+            else:
+                # 只有 room_init 信息
+                return {
+                    "room_id": real_room_id,
+                    "uid": room_init.get("uid"),
+                    "short_id": room_init.get("short_id", 0),
+                    "live_status": room_init.get("live_status", 0),
+                    "is_short_id": True,
+                    "input_id": input_room_id,
+                    "uname": "",
+                }
+        
+        logger.error(f"无法解析房间号: {input_room_id}")
         return None
     
     async def get_danmu_info(self, room_id: int) -> Optional[Dict[str, Any]]:
@@ -167,37 +287,44 @@ class BilibiliClient:
             logger.error(f"解除禁言异常: {e}")
         return False
     
-    async def get_ban_list(self, room_id: int, page: int = 1, page_size: int = 20) -> List[Dict[str, Any]]:
+    async def get_ban_list(self, room_id: int, page: int = 1, page_size: int = 50) -> List[Dict[str, Any]]:
         """获取禁言列表
         参考: https://socialsisteryi.github.io/bilibili-API-collect/docs/live/silent_user_manage.html
+        
+        注意: B站API使用 'ps' 作为页码参数名（不是 pn）
         """
         url = f"{self.BASE_URL}/xlive/web-ucenter/v1/banned/GetSilentUserList"
 
-        # ps = page size（每页数量），pn = page number（页码）
+        # 根据文档，ps 是页码参数（虽然命名容易混淆）
         data = {
             "room_id": str(room_id),
-            "pn": str(page),
-            "ps": str(page_size),
+            "ps": str(page),  # 页码（从1开始）
             "csrf": settings.BILI_JCT,
             "csrf_token": settings.BILI_JCT,
             "visit_id": "",
         }
         
+        logger.debug(f"获取禁言列表请求: room_id={room_id}, page={page}")
+        
         try:
             resp = await self.client.post(url, data=data)
             text = resp.text
-            logger.debug(f"禁言列表响应: {text[:200]}")
+            logger.debug(f"禁言列表原始响应: {text[:500]}")
             
             if not text:
                 logger.warning("禁言列表返回空响应")
                 return []
             
             result = resp.json()
+            logger.debug(f"禁言列表解析结果: code={result.get('code')}")
+            
             if result.get("code") == 0:
                 ban_data = result.get("data", {}).get("data", [])
-                logger.info(f"获取禁言列表成功: 共 {len(ban_data)} 条")
+                total = result.get("data", {}).get("total", 0)
+                logger.info(f"获取禁言列表成功: 共 {len(ban_data)} 条, 总计 {total} 条")
                 return ban_data
-            logger.warning(f"获取禁言列表失败: code={result.get('code')}, msg={result.get('message')}")
+            else:
+                logger.warning(f"获取禁言列表失败: code={result.get('code')}, message={result.get('message')}")
         except Exception as e:
             logger.error(f"获取禁言列表异常: {e}")
             import traceback

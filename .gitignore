@@ -53,3 +53,6 @@ B 站房管工具-*.zip
 .pytest_cache/
 .coverage
 htmlcov/
+
+# AI 配置文件
+AGENTS.md

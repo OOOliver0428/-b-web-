@@ -43,7 +43,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="B站房管工具 API",
         description="B站直播弹幕监控和房管管理工具",
-        version="1.2.0",
+        version="1.3.0",
         lifespan=lifespan
     )
     
@@ -68,6 +68,11 @@ def create_app() -> FastAPI:
     static_dir = os.path.join(os.path.dirname(__file__), "static")
     if os.path.exists(static_dir):
         app.mount("/static", StaticFiles(directory=static_dir), name="static")
+        
+        # 大航海背景图目录
+        guard_bg_dir = os.path.join(static_dir, "guard_bg")
+        if os.path.exists(guard_bg_dir):
+            app.mount("/guard_bg", StaticFiles(directory=guard_bg_dir), name="guard_bg")
     
     # 根路由 - 返回前端页面
     @app.get("/")

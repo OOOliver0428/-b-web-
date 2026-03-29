@@ -19,7 +19,7 @@
 
 适用于 Windows 用户，无需安装 Python。
 
-1. **下载** `B站房管工具-v1.1.0.zip` 并解压
+1. **下载** `B站房管工具-v1.3.0.zip` 并解压
 2. **配置 Cookie**
    - 复制 `.env.example` 为 `.env`
    - 填写 `SESSDATA` 和 `BILI_JCT`（获取方式见下方）
@@ -167,7 +167,7 @@ pip install pyinstaller
 python package_exe.py
 ```
 
-输出文件：`dist/B站房管工具-v1.1.0.zip`
+输出文件：`dist/B站房管工具-v1.3.0.zip`
 
 ## 注意事项
 

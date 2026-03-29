@@ -13,7 +13,8 @@ from app.services.moderation import moderation_service, ActionType
 @dataclass
 class Room:
     """直播间数据"""
-    room_id: int
+    room_id: int  # 真实房间号
+    input_room_id: int  # 用户输入的房间号（可能是短号）
     client: DanmakuClient
     status: str = "stopped"  # stopped, running, error
     danmaku_history: List[Dict] = field(default_factory=list)
@@ -21,6 +22,8 @@ class Room:
     callbacks: List[Callable] = field(default_factory=list)
     # 全局消息去重（多连接时避免重复）
     _seen_msg_ids: deque = field(default_factory=lambda: deque(maxlen=5000))
+    # 房间信息
+    room_info: Dict[str, Any] = field(default_factory=dict)  # 包含主播ID、标题等
     
     def add_callback(self, callback: Callable):
         """添加消息回调"""
@@ -110,35 +113,95 @@ class RoomManager:
         self.rooms: Dict[int, Room] = {}
         self._lock = asyncio.Lock()
     
-    async def start_room(self, room_id: int) -> bool:
-        """启动直播间监听"""
+    async def start_room(self, room_id: int) -> Dict[str, Any]:
+        """
+        启动直播间监听
+        支持短号自动翻译
+        
+        返回: {
+            "success": bool,
+            "room_id": 真实房间号,
+            "input_id": 用户输入的房间号,
+            "title": 直播标题,
+            "anchor_id": 主播ID,
+            "anchor_name": 主播名称,
+            "live_status": 直播状态,
+            "message": 提示信息
+        }
+        """
         async with self._lock:
-            if room_id in self.rooms:
-                room = self.rooms[room_id]
-                if room.status == "running":
-                    logger.info(f"房间已在运行: {room_id}")
-                    return True
+            # 1. 解析房间号（支持短号翻译）
+            room_info = await bili_client.resolve_room_id(room_id)
+            if not room_info:
+                logger.error(f"无法解析房间号: {room_id}")
+                return {
+                    "success": False,
+                    "message": "房间不存在或无法访问"
+                }
             
-            # 创建客户端
+            real_room_id = room_info.get("room_id")
+            
+            # 检查房间是否已在运行
+            if real_room_id in self.rooms:
+                room = self.rooms[real_room_id]
+                if room.status == "running":
+                    logger.info(f"房间已在运行: {real_room_id}")
+                    return {
+                        "success": True,
+                        "room_id": real_room_id,
+                        "input_id": room_id,
+                        "title": room_info.get("title", ""),
+                        "anchor_id": room_info.get("uid") or room_info.get("anchor_id"),
+                        "anchor_name": room_info.get("uname", ""),
+                        "live_status": room_info.get("live_status", 0),
+                        "message": "房间已在运行"
+                    }
+            
+            # 2. 创建客户端（使用真实房间号）
             client = DanmakuClient(
-                room_id=room_id,
+                room_id=real_room_id,
                 on_danmaku=None  # 稍后在Room中设置
             )
             
-            room = Room(room_id=room_id, client=client)
+            # 3. 创建房间对象
+            room = Room(
+                room_id=real_room_id,
+                input_room_id=room_id,
+                client=client,
+                room_info=room_info
+            )
             # 设置客户端回调为room的on_message
             client.on_danmaku_callback = room.on_message
             
-            # 启动客户端
+            # 4. 启动客户端
             if await client.start():
                 room.status = "running"
-                self.rooms[room_id] = room
-                logger.info(f"房间启动成功: {room_id}")
-                return True
+                self.rooms[real_room_id] = room
+                
+                # 构建成功响应
+                result = {
+                    "success": True,
+                    "room_id": real_room_id,
+                    "input_id": room_id,
+                    "title": room_info.get("title", ""),
+                    "anchor_id": room_info.get("uid") or room_info.get("anchor_id"),
+                    "anchor_name": room_info.get("uname", ""),
+                    "live_status": room_info.get("live_status", 0),
+                    "message": f"房间启动成功{'(短号已翻译)' if room_info.get('is_short_id') else ''}"
+                }
+                
+                if room_info.get("is_short_id"):
+                    result["short_id"] = room_info.get("short_id", 0)
+                
+                logger.info(f"房间启动成功: {real_room_id} (输入: {room_id}), 标题: {result['title']}")
+                return result
             else:
                 room.status = "error"
-                logger.error(f"房间启动失败: {room_id}")
-                return False
+                logger.error(f"房间启动失败: {real_room_id}")
+                return {
+                    "success": False,
+                    "message": "连接弹幕服务器失败"
+                }
     
     async def stop_room(self, room_id: int):
         """停止直播间监听"""
@@ -168,8 +231,13 @@ class RoomManager:
         return [
             {
                 "room_id": r.room_id,
+                "input_room_id": r.input_room_id,
                 "status": r.status,
                 "danmaku_count": len(r.danmaku_history),
+                "title": r.room_info.get("title", ""),
+                "anchor_id": r.room_info.get("uid") or r.room_info.get("anchor_id"),
+                "anchor_name": r.room_info.get("uname", ""),
+                "live_status": r.room_info.get("live_status", 0),
             }
             for r in self.rooms.values()
         ]

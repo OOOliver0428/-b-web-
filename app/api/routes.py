@@ -55,12 +55,23 @@ class AutoModerationConfig(BaseModel):
 
 @router.post("/rooms/start")
 async def start_room(data: RoomCreate):
-    """启动直播间监听"""
-    success = await room_manager.start_room(data.room_id)
-    if success:
-        return {"code": 0, "message": "启动成功", "data": {"room_id": data.room_id}}
+    """启动直播间监听（支持短号自动翻译）"""
+    result = await room_manager.start_room(data.room_id)
+    if result.get("success"):
+        return {
+            "code": 0, 
+            "message": result.get("message", "启动成功"),
+            "data": {
+                "room_id": result.get("room_id"),
+                "input_id": result.get("input_id"),
+                "title": result.get("title"),
+                "anchor_id": result.get("anchor_id"),
+                "anchor_name": result.get("anchor_name"),
+                "live_status": result.get("live_status"),
+            }
+        }
     else:
-        raise HTTPException(status_code=400, detail="启动失败，请检查房间号")
+        raise HTTPException(status_code=400, detail=result.get("message", "启动失败"))
 
 
 @router.post("/rooms/stop")

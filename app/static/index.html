@@ -37,6 +37,52 @@
       font-size: 20px;
       font-weight: 600;
       color: #00a1d6;
+      flex-shrink: 0;
+    }
+
+    /* 直播信息栏 */
+    .room-info-bar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex: 1;
+      justify-content: center;
+      margin: 0 20px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ed 100%);
+      border-radius: 8px;
+      border: 1px solid #dcdfe6;
+    }
+
+    .room-info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .room-info-label {
+      font-size: 12px;
+      color: #909399;
+      font-weight: 500;
+    }
+
+    .room-info-value {
+      font-size: 14px;
+      color: #303133;
+      font-weight: 600;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .room-info-value.uid {
+      font-family: 'Courier New', monospace;
+      color: #00a1d6;
+      background: #e6f7ff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 13px;
     }
 
     .header-controls {
@@ -188,6 +234,57 @@
     .danmaku-item.new {
       background: #e6f7ff;
       animation: fadeIn 0.5s ease;
+    }
+
+    /* 大航海等级背景 */
+    .danmaku-item.guard-1 {
+      background-image: url('/guard_bg/governor.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 1px solid #ffd700;
+    }
+
+    .danmaku-item.guard-2 {
+      background-image: url('/guard_bg/lieutenant.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 1px solid #ff69b4;
+    }
+
+    .danmaku-item.guard-3 {
+      background-image: url('/guard_bg/captain.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 1px solid #00ced1;
+    }
+
+    .danmaku-item.guard-1,
+    .danmaku-item.guard-2,
+    .danmaku-item.guard-3 {
+      position: relative;
+    }
+
+    .danmaku-item.guard-1::before,
+    .danmaku-item.guard-2::before,
+    .danmaku-item.guard-3::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      z-index: 0;
+    }
+
+    .danmaku-item.guard-1 > *,
+    .danmaku-item.guard-2 > *,
+    .danmaku-item.guard-3 > * {
+      position: relative;
+      z-index: 1;
     }
 
     .danmaku-item.super-chat {
@@ -346,16 +443,37 @@
       background: #f5f7fa;
     }
 
-    .ban-item {
+    /* 禁言列表 - 简洁模式 */
+    .ban-item-simple {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px;
+      padding: 8px 10px;
       border-bottom: 1px solid #ebeef5;
+      transition: background 0.2s;
     }
 
-    .ban-item:last-child {
+    .ban-item-simple:hover {
+      background: #f5f7fa;
+    }
+
+    .ban-item-simple:last-child {
       border-bottom: none;
+    }
+
+    .ban-user-name {
+      font-size: 13px;
+      color: #303133;
+      font-weight: 500;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ban-item-actions {
+      display: flex;
+      gap: 6px;
     }
 
     .ban-name {
@@ -366,6 +484,45 @@
     .ban-time {
       font-size: 11px;
       color: #909399;
+    }
+
+    /* 禁言详情 */
+    .ban-detail-row {
+      display: flex;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .ban-detail-label {
+      width: 100px;
+      color: #909399;
+      flex-shrink: 0;
+    }
+
+    .ban-detail-value {
+      flex: 1;
+      color: #303133;
+      font-weight: 500;
+    }
+
+    .ban-detail-value.forever {
+      color: #f56c6c;
+    }
+
+    .ban-detail-value.admin {
+      color: #00a1d6;
+    }
+
+    .ban-message-box {
+      background: #f5f7fa;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 13px;
+      color: #606266;
+      max-height: 100px;
+      overflow-y: auto;
+      word-break: break-all;
     }
 
     .word-tags {
@@ -492,6 +649,23 @@
       <!-- 顶部栏 -->
       <header class="header">
         <div class="header-title">📺 B站房管工具</div>
+        
+        <!-- 直播信息展示区 -->
+        <div v-if="isConnected" class="room-info-bar">
+          <div class="room-info-item">
+            <span class="room-info-label">主播</span>
+            <span class="room-info-value">{{ roomInfo.anchorName || '未知' }}</span>
+          </div>
+          <div class="room-info-item">
+            <span class="room-info-label">标题</span>
+            <span class="room-info-value" :title="roomInfo.title">{{ roomInfo.title || '未获取' }}</span>
+          </div>
+          <div class="room-info-item">
+            <span class="room-info-label">UID</span>
+            <span class="room-info-value uid">{{ roomInfo.anchorId || '-' }}</span>
+          </div>
+        </div>
+        
         <div class="header-controls">
           <div class="status">
             <span class="status-dot" :class="statusClass"></span>
@@ -501,7 +675,7 @@
             type="text"
             class="input-box"
             v-model="roomId"
-            placeholder="输入房间号"
+            placeholder="输入房间号(支持短号)"
             :disabled="isConnected"
           >
           <button
@@ -531,7 +705,13 @@
               v-for="(item, index) in danmakuList"
               :key="index"
               class="danmaku-item"
-              :class="{ new: item.isNew, 'super-chat': item.type === 'super_chat' }"
+              :class="{ 
+                new: item.isNew, 
+                'super-chat': item.type === 'super_chat',
+                'guard-1': item.user?.guard_level === 1,
+                'guard-2': item.user?.guard_level === 2,
+                'guard-3': item.user?.guard_level === 3
+              }"
               :style="item.type === 'super_chat' ? { backgroundColor: item.background_color + '20', borderLeft: '4px solid ' + item.background_color } : {}"
             >
               <div class="avatar">{{ item.user?.name?.charAt(0) || '?' }}</div>
@@ -576,18 +756,21 @@
           <!-- 禁言列表 -->
           <div class="panel">
             <div class="panel-header">
-              禁言列表
+              禁言列表 ({{ banList.length }})
               <button class="btn btn-default" style="padding: 4px 8px; font-size: 12px;" @click="loadBanList" :disabled="!currentRoomId">刷新</button>
             </div>
             <div class="panel-body">
-              <div v-for="item in banList" :key="item.id" class="ban-item">
-                <div>
-                  <div class="ban-name">{{ item.tname }}</div>
-                  <div class="ban-time">{{ item.ctime }}</div>
+              <div v-for="item in banList" :key="item.id" class="ban-item-simple">
+                <span class="ban-user-name">{{ item.tname || item.uname || '未知用户' }}</span>
+                <div class="ban-item-actions">
+                  <button class="btn btn-default" style="padding: 3px 8px; font-size: 11px;" @click="showBanDetail(item)">详情</button>
+                  <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" @click="unbanUser(item)">解禁</button>
                 </div>
-                <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" @click="unbanUser(item)">解禁</button>
               </div>
-              <div v-if="banList.length === 0" class="empty-tip">暂无禁言用户</div>
+              <div v-if="banList.length === 0" class="empty-tip">
+                暂无禁言用户<br>
+                <span style="font-size: 11px; color: #c0c4cc;">（注意：只有房管才能看到禁言列表）</span>
+              </div>
             </div>
           </div>
 
@@ -595,22 +778,6 @@
           <div class="panel">
             <div class="panel-header">敏感词过滤</div>
             <div class="panel-body">
-              <!-- 词库文件选择 -->
-              <div style="margin-bottom: 12px;">
-                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">切换词库</label>
-                <div style="display: flex; gap: 8px;">
-                  <select v-model="selectedWordFile" class="input-box" style="flex: 1;">
-                    <option v-for="f in wordFiles" :key="f" :value="f">{{ f }}</option>
-                  </select>
-                  <button class="btn btn-default" style="padding: 4px 10px; font-size: 12px;" @click="loadWordFile(false)">替换</button>
-                  <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px;" @click="loadWordFile(true)">合并</button>
-                </div>
-                <div style="font-size: 11px; color: #999; margin-top: 4px;">
-                  已加载: {{ loadedFiles.join(', ') || '无' }} ({{ sensitiveWords.length }} 词)
-                </div>
-              </div>
-              
-              <!-- 敏感词列表 -->
               <div class="word-tags">
                 <span v-for="word in sensitiveWords" :key="word" class="word-tag">
                   {{ word }}
@@ -678,6 +845,43 @@
         </div>
       </div>
     </div>
+
+    <!-- 禁言详情弹窗 -->
+    <div v-if="banDetailModal.show" class="modal-overlay" @click.self="banDetailModal.show = false">
+      <div class="modal" style="width: 450px;">
+        <div class="modal-header">禁言详情</div>
+        <div class="modal-body">
+          <div class="ban-detail-row">
+            <span class="ban-detail-label">被禁言用户：</span>
+            <span class="ban-detail-value">{{ banDetailModal.data?.tname || banDetailModal.data?.uname || '未知' }}</span>
+          </div>
+          <div class="ban-detail-row">
+            <span class="ban-detail-label">操作执行者：</span>
+            <span class="ban-detail-value admin">{{ banDetailModal.data?.name || '未知' }}</span>
+          </div>
+          <div class="ban-detail-row">
+            <span class="ban-detail-label">禁言开始时间：</span>
+            <span class="ban-detail-value">{{ banDetailModal.data?.ctime || '未知' }}</span>
+          </div>
+          <div class="ban-detail-row">
+            <span class="ban-detail-label">禁言到期时间：</span>
+            <span class="ban-detail-value" :class="{ forever: banDetailModal.data?.hour === -1 || banDetailModal.data?.is_forever }">
+              {{ getBanExpireTime(banDetailModal.data) }}
+            </span>
+          </div>
+          <div class="ban-detail-row" style="flex-direction: column;">
+            <span class="ban-detail-label" style="margin-bottom: 8px;">被禁言的发言内容：</span>
+            <div class="ban-message-box">
+              {{ banDetailModal.data?.msg || banDetailModal.data?.content || '（无记录）' }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default" @click="banDetailModal.show = false">关闭</button>
+          <button class="btn btn-danger" @click="unbanFromDetail">解除禁言</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Vue 3 -->
@@ -710,11 +914,15 @@
         const banList = ref([]);
         const sensitiveWords = ref([]);
         const newWord = ref('');
-        const autoCheck = ref(true);
-        // 敏感词文件管理
-        const wordFiles = ref([]);
-        const selectedWordFile = ref('');
-        const loadedFiles = ref([]);
+        const autoCheck = ref(false);  // 默认关闭敏感词自动禁言
+        
+        // 房间信息
+        const roomInfo = ref({
+          title: '',
+          anchorId: null,
+          anchorName: '',
+          liveStatus: 0
+        });
 
         // 弹窗
         const banModal = ref({
@@ -723,6 +931,12 @@
           msg: '',
           hour: 1,
           reason: ''
+        });
+        
+        // 禁言详情弹窗
+        const banDetailModal = ref({
+          show: false,
+          data: null
         });
 
         // 计算属性
@@ -833,10 +1047,21 @@
               throw new Error(err.detail || '启动失败');
             }
 
-            currentRoomId.value = rid;
+            const result = await response.json();
+            currentRoomId.value = result.data.room_id;
+            
+            // 保存房间信息
+            roomInfo.value = {
+              title: result.data.title || '',
+              anchorId: result.data.anchor_id,
+              anchorName: result.data.anchor_name || '',
+              liveStatus: result.data.live_status
+            };
+            
+            console.log('房间信息:', roomInfo.value);
 
-            // 2. 连接 WebSocket
-            connectWebSocket(rid);
+            // 2. 连接 WebSocket（使用真实房间号）
+            connectWebSocket(result.data.room_id);
 
           } catch (error) {
             isConnecting.value = false;
@@ -874,6 +1099,7 @@
           currentRoomId.value = null;
           danmakuList.value = [];
           userList.value = [];
+          roomInfo.value = { title: '', anchorId: null, anchorName: '', liveStatus: 0 };
         }
 
         function handleMessage(data) {
@@ -885,7 +1111,7 @@
           if (data.type === 'danmaku') {
             addDanmaku(data, true);
 
-            // 自动审核弹幕
+            // 自动审核
             if (autoCheck.value) {
               checkAutoModeration(data);
             }
@@ -894,11 +1120,6 @@
           // 醒目留言（Super Chat）
           if (data.type === 'super_chat') {
             addDanmaku(data, true);
-
-            // 自动审核 SC
-            if (autoCheck.value) {
-              checkAutoModeration(data);
-            }
           }
 
           if (data.type === 'enter') {
@@ -959,14 +1180,13 @@
         }
 
         function checkAutoModeration(danmaku) {
-          const content = danmaku.content || danmaku.message || '';
+          const content = danmaku.content || '';
           const userId = danmaku.user?.uid;
-          if (!userId || !content) return;
+          if (!userId) return;
 
           for (const word of sensitiveWords.value) {
             if (content.includes(word)) {
-              // 自动禁言使用静默模式（不弹 alert）
-              banUserDirect(userId, 1, `触发敏感词: ${word}`, true);
+              banUserDirect(userId, 1, `触发敏感词: ${word}`);
               return;
             }
           }
@@ -988,14 +1208,13 @@
           await banUserDirect(
             banModal.value.user.uid,
             banModal.value.hour,
-            banModal.value.reason,
-            false  // 手动禁言，保留提示
+            banModal.value.reason
           );
           banModal.value.show = false;
           loadBanList();
         }
 
-        async function banUserDirect(userId, hour, reason, silent = false) {
+        async function banUserDirect(userId, hour, reason) {
           if (!currentRoomId.value) return;
           try {
             const response = await fetch(`${API_BASE}/api/moderation/ban`, {
@@ -1009,24 +1228,12 @@
               })
             });
             if (response.ok) {
-              if (!silent) {
-                alert('禁言成功');
-              } else {
-                console.log(`[自动禁言] 用户 ${userId} 已被禁言: ${reason}`);
-              }
+              alert('禁言成功');
             } else {
-              if (!silent) {
-                alert('禁言失败');
-              } else {
-                console.error(`[自动禁言] 禁言用户 ${userId} 失败`);
-              }
+              alert('禁言失败');
             }
           } catch (e) {
-            if (!silent) {
-              alert('禁言请求失败');
-            } else {
-              console.error('[自动禁言] 请求异常:', e);
-            }
+            alert('禁言请求失败');
           }
         }
 
@@ -1057,10 +1264,72 @@
           try {
             const response = await fetch(`${API_BASE}/api/moderation/ban-list/${currentRoomId.value}`);
             const data = await response.json();
-            banList.value = data.data || [];
+            if (data.code === 0) {
+              banList.value = data.data || [];
+              console.log(`禁言列表加载成功: ${banList.value.length} 条`);
+            } else {
+              console.error('禁言列表加载失败:', data.message);
+            }
           } catch (e) {
             console.error('Load ban list error:', e);
           }
+        }
+
+        function showBanDetail(item) {
+          banDetailModal.value = {
+            show: true,
+            data: item
+          };
+        }
+
+        function getBanExpireTime(item) {
+          if (!item) return '未知';
+          // 优先使用 block_end_time 字段
+          if (item.block_end_time) {
+            // 如果是时间戳（秒或毫秒）
+            if (typeof item.block_end_time === 'number') {
+              const timestamp = item.block_end_time > 1000000000000 
+                ? item.block_end_time  // 毫秒
+                : item.block_end_time * 1000;  // 秒转毫秒
+              const date = new Date(timestamp);
+              // 检查是否是永久禁言（时间戳很大，比如2100年以后）
+              if (date.getFullYear() > 2099) {
+                return '永久';
+              }
+              return date.toLocaleString('zh-CN');
+            }
+            // 如果是字符串
+            if (typeof item.block_end_time === 'string') {
+              if (item.block_end_time.includes('2099') || item.block_end_time.includes('2100')) {
+                return '永久';
+              }
+              return item.block_end_time;
+            }
+          }
+          // 使用 hour 字段判断
+          if (item.hour === -1 || item.is_forever) {
+            return '永久';
+          }
+          if (item.hour === 0) {
+            return '本场直播结束';
+          }
+          // 计算到期时间
+          if (item.ctime && item.hour > 0) {
+            try {
+              const startTime = new Date(item.ctime.replace(/-/g, '/'));
+              const expireTime = new Date(startTime.getTime() + item.hour * 60 * 60 * 1000);
+              return expireTime.toLocaleString('zh-CN');
+            } catch (e) {
+              return `${item.hour}小时后`;
+            }
+          }
+          return '未知';
+        }
+
+        async function unbanFromDetail() {
+          if (!banDetailModal.value.data) return;
+          await unbanUser(banDetailModal.value.data);
+          banDetailModal.value.show = false;
         }
 
         async function deleteDanmaku(item) {
@@ -1092,95 +1361,29 @@
             const data = await response.json();
             if (data.code === 0 && data.data) {
               sensitiveWords.value = data.data;
-              loadedFiles.value = data.loaded_files || [];
             }
           } catch (e) {
             console.error('加载敏感词失败:', e);
           }
         }
 
-        // 加载可用的敏感词文件列表
-        async function loadWordFilesList() {
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-word-files`);
-            const data = await response.json();
-            if (data.code === 0) {
-              wordFiles.value = data.data || [];
-              if (wordFiles.value.length > 0 && !selectedWordFile.value) {
-                selectedWordFile.value = wordFiles.value[0];
-              }
-            }
-          } catch (e) {
-            console.error('加载词库文件列表失败:', e);
-          }
-        }
-
-        // 加载/合并词库文件
-        async function loadWordFile(merge) {
-          if (!selectedWordFile.value) return;
-          const endpoint = merge ? 'load-merge' : 'load';
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-words/${endpoint}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ filename: selectedWordFile.value })
-            });
-            const data = await response.json();
-            if (data.code === 0) {
-              sensitiveWords.value = data.data || [];
-              await loadSensitiveWords();  // 刷新 loaded_files
-              console.log(data.message);
-            } else {
-              alert('加载失败: ' + data.message);
-            }
-          } catch (e) {
-            console.error('加载词库失败:', e);
-            alert('加载失败');
-          }
-        }
-
-        async function addWord() {
+        function addWord() {
           const word = newWord.value.trim();
           if (!word) return;
           if (sensitiveWords.value.includes(word)) {
             alert('该敏感词已存在');
             return;
           }
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-words/add`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ word, filename: 'default.md' })
-            });
-            const data = await response.json();
-            if (data.code === 0) {
-              sensitiveWords.value = data.data || [];
-              newWord.value = '';
-            } else {
-              alert(data.message || '添加失败');
-            }
-          } catch (e) {
-            console.error('添加敏感词失败:', e);
-            alert('请求失败');
-          }
+          sensitiveWords.value.push(word);
+          newWord.value = '';
+          // 注意：当前后端敏感词通过 .env 配置，前端添加仅在内存中生效
+          // 刷新页面后会丢失。如需持久化请通过 sensitive_words/*.md 文件配置
         }
 
-        async function removeWord(word) {
-          try {
-            const response = await fetch(`${API_BASE}/api/moderation/sensitive-words/remove`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ word, filename: 'default.md' })
-            });
-            const data = await response.json();
-            if (data.code === 0) {
-              sensitiveWords.value = data.data || [];
-            } else {
-              alert(data.message || '移除失败');
-            }
-          } catch (e) {
-            console.error('移除敏感词失败:', e);
-            alert('请求失败');
+        function removeWord(word) {
+          const idx = sensitiveWords.value.indexOf(word);
+          if (idx > -1) {
+            sensitiveWords.value.splice(idx, 1);
           }
         }
 
@@ -1195,9 +1398,8 @@
         // 定期刷新禁言列表
         let interval = null;
         onMounted(() => {
-          // 加载后端敏感词和词库文件列表
+          // 加载后端敏感词
           loadSensitiveWords();
-          loadWordFilesList();
           // 定期刷新禁言列表
           interval = setInterval(() => {
             if (isConnected.value) loadBanList();
@@ -1224,20 +1426,21 @@
           newWord,
           autoCheck,
           banModal,
+          banDetailModal,
           currentRoomId,
-          wordFiles,
-          selectedWordFile,
-          loadedFiles,
+          roomInfo,
           toggleConnection,
           banUser,
           confirmBan,
           unbanUser,
           loadBanList,
+          showBanDetail,
+          getBanExpireTime,
+          unbanFromDetail,
           deleteDanmaku,
           clearDanmaku,
           addWord,
           removeWord,
-          loadWordFile,
           formatTime
         };
       }
