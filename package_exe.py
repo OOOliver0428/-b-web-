@@ -161,9 +161,9 @@ Bilibili: 江边砍柴
 """)
     
     # 创建压缩包
-    zip_path = DIST_DIR / "B站房管工具-v1.3.0.zip"
+    zip_path = DIST_DIR / "B站房管工具-v1.3.1.zip"
     shutil.make_archive(
-        str(DIST_DIR / "B站房管工具-v1.3.0"),
+        str(DIST_DIR / "B站房管工具-v1.3.1"),
         'zip',
         str(package_dir)
     )

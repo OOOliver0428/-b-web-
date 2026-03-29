@@ -43,7 +43,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="B站房管工具 API",
         description="B站直播弹幕监控和房管管理工具",
-        version="1.3.0",
+        version="1.3.1",
         lifespan=lifespan
     )
     

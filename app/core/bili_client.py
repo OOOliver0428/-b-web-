@@ -288,45 +288,65 @@ class BilibiliClient:
         return False
     
     async def get_ban_list(self, room_id: int, page: int = 1, page_size: int = 50) -> List[Dict[str, Any]]:
-        """获取禁言列表
+        """获取禁言列表（自动获取所有分页数据）
         参考: https://socialsisteryi.github.io/bilibili-API-collect/docs/live/silent_user_manage.html
         
         注意: B站API使用 'ps' 作为页码参数名（不是 pn）
+        默认每页返回10条，需要分页获取所有数据
         """
         url = f"{self.BASE_URL}/xlive/web-ucenter/v1/banned/GetSilentUserList"
-
-        # 根据文档，ps 是页码参数（虽然命名容易混淆）
-        data = {
-            "room_id": str(room_id),
-            "ps": str(page),  # 页码（从1开始）
-            "csrf": settings.BILI_JCT,
-            "csrf_token": settings.BILI_JCT,
-            "visit_id": "",
-        }
-        
-        logger.debug(f"获取禁言列表请求: room_id={room_id}, page={page}")
+        all_ban_data = []
+        current_page = 1
+        max_pages = 10  # 最多获取10页，防止无限循环
         
         try:
-            resp = await self.client.post(url, data=data)
-            text = resp.text
-            logger.debug(f"禁言列表原始响应: {text[:500]}")
-            
-            if not text:
-                logger.warning("禁言列表返回空响应")
-                return []
-            
-            result = resp.json()
-            logger.debug(f"禁言列表解析结果: code={result.get('code')}")
-            
-            if result.get("code") == 0:
+            while current_page <= max_pages:
+                data = {
+                    "room_id": str(room_id),
+                    "ps": str(current_page),  # 页码（从1开始）
+                    "csrf": settings.BILI_JCT,
+                    "csrf_token": settings.BILI_JCT,
+                    "visit_id": "",
+                }
+                
+                logger.debug(f"获取禁言列表请求: room_id={room_id}, page={current_page}")
+                
+                resp = await self.client.post(url, data=data)
+                text = resp.text
+                
+                if not text:
+                    logger.warning(f"禁言列表第{current_page}页返回空响应")
+                    break
+                
+                result = resp.json()
+                
+                if result.get("code") != 0:
+                    logger.warning(f"获取禁言列表失败: code={result.get('code')}, message={result.get('message')}")
+                    break
+                
                 ban_data = result.get("data", {}).get("data", [])
                 total = result.get("data", {}).get("total", 0)
-                logger.info(f"获取禁言列表成功: 共 {len(ban_data)} 条, 总计 {total} 条")
-                return ban_data
-            else:
-                logger.warning(f"获取禁言列表失败: code={result.get('code')}, message={result.get('message')}")
+                total_page = result.get("data", {}).get("total_page", 1)
+                
+                if not ban_data:
+                    break
+                
+                all_ban_data.extend(ban_data)
+                logger.info(f"获取禁言列表第{current_page}页成功: 本页{len(ban_data)}条, 总计{total}条, 共{total_page}页")
+                
+                # 如果已获取完所有数据，退出循环
+                if current_page >= total_page or len(all_ban_data) >= total:
+                    break
+                
+                current_page += 1
+            
+            logger.info(f"获取禁言列表完成: 共 {len(all_ban_data)} 条")
+            return all_ban_data
+            
         except Exception as e:
             logger.error(f"获取禁言列表异常: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
             import traceback
             logger.error(traceback.format_exc())
         return []
